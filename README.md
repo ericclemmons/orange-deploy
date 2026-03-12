@@ -16,6 +16,45 @@ by answering:
 
 > **How simple _could_ this be?**
 
+## Product Surfaces
+
+There are 3 primary places that users interact with Pages & Workers Builds & Deployments:
+
+1. Wrangler (e.g. `wrangler deploy` or `wrangler pages deploy`)
+2. GitHub Actions (e.g. CI & CD that calls `wrangler deploy`)
+3. Dashboard UI (e.g. Click-Ops)
+
+_I'm intentionally not listing [🧪 Alchemy][alchemy] here because it hasn't reached critical mass (yet) and
+largely replaces `wrangler` in the CI/CD surface._
+
+### Wrangler
+
+I'm not looking to change this behavior at all. If anything, this is the foundational piece that,
+at least for now, removes complexity from what's needed to build & deploy.
+
+### GitHub Actions
+
+The existing [Pages Action][pages-action] & [Wrangler Action][wrangler-action] is consistent with what
+I want to offer here.
+
+**However, I want to opt for _no action_ by default.**
+
+The ideal is that `npm run deploy` just calls `npx wrangler` anyway.
+
+### Dashboard UI
+
+This is where things are most complex. The Pages UI is divergent from the Workers UI.
+Different routes. Different components. Different configs. Different feature (e.g. deploy hooks)
+
+My goal here is to create a unified interface that smooths out these details because,
+whether you're using Pages or Workers, **you're just deploying your app**.
+
+## Acceptance Criteria
+
+This project will consist of both use-cases & examples to validate end-to-end behavior.
+The point isn't to test the implementation – but to **verify the desired behavior**.
+
+[alchemy]: https://alchemy.run/
 [pages]: https://pages.cloudflare.com/
 [workers]: https://workers.cloudflare.com/
 [wrangler-action]: https://github.com/cloudflare/wrangler-action
