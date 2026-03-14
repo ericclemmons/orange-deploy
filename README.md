@@ -87,6 +87,8 @@ The point isn't to test the _current_ implementation – but to **verify the des
   - [ ] Auto-fix deploy errors
   - [ ] Wrangler-less
     - [ ] Infer bindings from code (e.g. `import { d1 } from "cloudflare:env"`)
+  - [ ] `click-to-component` using https://www.element-source.com/
+        See `vite-plugin-react-click-to-component`
 
 [alchemy]: https://alchemy.run/
 [pages]: https://pages.cloudflare.com/
