@@ -1,3 +1,7 @@
+@source "../node_modules/@cloudflare/kumo/dist/**/*.{js,jsx,ts,tsx}";
+@import "@cloudflare/kumo/styles/tailwind";
+@import "tailwindcss";
+
 :root {
   --text: #6b6375;
   --text-h: #08060d;

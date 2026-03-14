@@ -56,7 +56,7 @@ The point isn't to test the _current_ implementation – but to **verify the des
 
 - Scaffolding
   - [x] App
-    - [ ] Using https://kumo-ui.com/ 💅
+    - [x] Using https://kumo-ui.com/ 💅
   - [ ] Connect to GitHub
     - [ ] SCM needs to be persisted
   - [ ] Connect to Cloudflare
