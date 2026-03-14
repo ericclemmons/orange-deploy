@@ -1,6 +1,6 @@
-# Cloudflare Deploy
+# Orange Deploy
 
-> Experiment for BYOB(uilds) for Workers &amp; Pages.
+> Experiment for BYOB(uilds) for Cloudflare Workers &amp; Pages.
 
 ## Why?
 
@@ -54,13 +54,39 @@ whether you're using Pages or Workers, **you're just deploying your app**.
 This project will consist of both use-cases & examples to validate end-to-end behavior.
 The point isn't to test the _current_ implementation – but to **verify the desired behavior**.
 
-- [ ] Deploy on push to `main`
-- [ ] Deploy on push to any branch (e.g. `stage`)
-- [ ] Deploy button
-- [ ] Cancel Deploy
-- [ ] Queued builds
-- [ ] Custom `Dockerfile`
-- [ ] Fork Bomb
+- Scaffolding
+  - [ ] App
+    - [ ] Using https://kumo-ui.com/ 💅
+  - [ ] Connect to GitHub
+    - [ ] SCM needs to be persisted
+  - [ ] Connect to Cloudflare
+        _Should this just be a "Deploy to Cloudflare" button to run on your own infra, instead of multi-tenant?
+        That would just require a Cloudflare API token..._
+
+- Pages
+  - [ ] Deploy on push to `main`
+  - [ ] Deploy on push to any branch (e.g. `staging`)
+  - [ ] Preview URLs
+
+- Workers
+  - [ ] Deploy on push to `main`
+  - [ ] Deploy on push to any branch (e.g. `pr-123`)
+  - [ ] Preview URLs
+  - [ ] Deploy button
+  - [ ] Cancel Deploy
+  - [ ] Queued builds
+  - [ ] Custom `Dockerfile`
+  - [ ] Fork Bomb
+
+- DX
+  - [ ] Auto-detect `vite-plus`:
+    - [ ] `vp check`, `vp test`, `vp build`
+  - [ ] Auto-fix lint errors
+  - [ ] Auto-fix test errors
+  - [ ] Auto-fix build errors
+  - [ ] Auto-fix deploy errors
+  - [ ] Wrangler-less
+    - [ ] Infer bindings from code (e.g. `import { d1 } from "cloudflare:env"`)
 
 [alchemy]: https://alchemy.run/
 [pages]: https://pages.cloudflare.com/
