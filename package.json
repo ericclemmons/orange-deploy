@@ -1,25 +1,16 @@
 {
-  "name": "cloudflare-deploy",
-  "version": "1.0.0",
-  "description": "Experiment for BYOB(uilds) for Workers &amp; Pages.",
-  "author": "Eric Clemmons <eric@smarterspam.com>",
+  "name": "orange-deploy",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\"",
-    "check": "ultracite check",
-    "fix": "ultracite fix",
-    "prepare": "husky"
+    "prepare": "vp config"
   },
   "devDependencies": {
-    "husky": "^9.1.7",
-    "lint-staged": "^16.3.3",
-    "oxfmt": "^0.38.0",
-    "oxlint": "^1.53.0",
-    "ultracite": "7.2.5"
+    "vite-plus": "catalog:"
   },
-  "lint-staged": {
-    "*.{js,jsx,ts,tsx,json,jsonc,css,scss,md,mdx}": [
-      "pnpm dlx ultracite fix"
-    ]
+  "engines": {
+    "node": ">=22.12.0"
   },
   "packageManager": "pnpm@10.17.1"
 }
