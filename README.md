@@ -52,7 +52,15 @@ whether you're using Pages or Workers, **you're just deploying your app**.
 ## Acceptance Criteria
 
 This project will consist of both use-cases & examples to validate end-to-end behavior.
-The point isn't to test the implementation – but to **verify the desired behavior**.
+The point isn't to test the _current_ implementation – but to **verify the desired behavior**.
+
+- [ ] Deploy on push to `main`
+- [ ] Deploy on push to any branch (e.g. `stage`)
+- [ ] Deploy button
+- [ ] Cancel Deploy
+- [ ] Queued builds
+- [ ] Custom `Dockerfile`
+- [ ] Fork Bomb
 
 [alchemy]: https://alchemy.run/
 [pages]: https://pages.cloudflare.com/
