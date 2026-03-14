@@ -55,7 +55,7 @@ This project will consist of both use-cases & examples to validate end-to-end be
 The point isn't to test the _current_ implementation – but to **verify the desired behavior**.
 
 - Scaffolding
-  - [ ] App
+  - [x] App
     - [ ] Using https://kumo-ui.com/ 💅
   - [ ] Connect to GitHub
     - [ ] SCM needs to be persisted
