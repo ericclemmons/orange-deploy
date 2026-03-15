@@ -1,4 +1,13 @@
-import { Button, CloudflareLogo, Combobox, Flow, Surface, Text } from "@cloudflare/kumo";
+import {
+  Button,
+  CloudflareLogo,
+  Combobox,
+  Flow,
+  Grid,
+  GridItem,
+  Surface,
+  Text,
+} from "@cloudflare/kumo";
 import { CpuIcon, GithubLogoIcon, GlobeIcon } from "@phosphor-icons/react";
 
 import heroImg from "./assets/hero.png";
@@ -12,16 +21,22 @@ function App() {
       <div className="ticks"></div>
 
       <Surface className="p-16">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <CloudflareLogo className="cloudflare" variant="glyph" />
-          <GithubLogoIcon className="framework" size={24} />
-        </div>
+        <Grid variant="side-by-side">
+          <GridItem>
+            <Text variant="heading1">Orange Deploy</Text>
+            <Text variant="secondary">
+              No Wrangler. No GitHub Actions. <Text bold>You can just ship things.</Text>
+            </Text>
+          </GridItem>
 
-        <Text variant="heading1">Orange Deploy</Text>
-        <Text variant="secondary">
-          No Wrangler. No GitHub Actions. <Text bold>You can just ship things.</Text>
-        </Text>
+          <GridItem>
+            <div className="hero">
+              <img src={heroImg} className="base" width="170" height="179" alt="" />
+              <CloudflareLogo className="cloudflare" variant="glyph" />
+              <GithubLogoIcon className="framework" size={24} />
+            </div>
+          </GridItem>
+        </Grid>
       </Surface>
 
       <div className="ticks"></div>

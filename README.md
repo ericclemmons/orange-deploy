@@ -79,6 +79,7 @@ The point isn't to test the _current_ implementation – but to **verify the des
   - [ ] Fork Bomb
 
 - DX
+  - [ ] ❌ Cloudflare doesn't support OAuth clients (i.e. [Sign in with Cloudflare](https://x.com/ericclemmons/status/2032970074638692784))
   - [ ] Auto-detect `vite-plus`:
     - [ ] `vp check`, `vp test`, `vp build`
   - [ ] Auto-fix lint errors
