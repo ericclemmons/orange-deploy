@@ -1,5 +1,4 @@
 import { githubAuth } from "@hono/oauth-providers/github";
-// @ts-ignore
 import { env } from "cloudflare:workers";
 import { Hono } from "hono";
 import { getCookie, setCookie } from "hono/cookie";
