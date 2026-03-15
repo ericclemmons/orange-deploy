@@ -1,7 +1,9 @@
 import { defineConfig } from "vite-plus";
 
 export default defineConfig({
-  fmt: {},
+  fmt: {
+    sortImports: {},
+  },
   staged: {
     "*": "vp check --fix",
   },
