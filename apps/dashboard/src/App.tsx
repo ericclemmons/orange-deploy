@@ -5,6 +5,7 @@ import {
   Flow,
   Grid,
   GridItem,
+  Link,
   Surface,
   Text,
 } from "@cloudflare/kumo";
@@ -47,9 +48,12 @@ function App() {
         <Flow align="center">
           <Flow.Node
             render={
-              <Button icon={<GithubLogoIcon />} variant="primary">
-                Connect to GitHub
-              </Button>
+              <Link href="/api/auth/github" variant="plain">
+                <Button icon={<GithubLogoIcon />} variant="primary">
+                  Connect to GitHub
+                  <Link.ExternalIcon />
+                </Button>
+              </Link>
             }
           />
 

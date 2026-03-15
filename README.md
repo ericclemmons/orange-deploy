@@ -57,11 +57,14 @@ The point isn't to test the _current_ implementation – but to **verify the des
 - Scaffolding
   - [x] App
     - [x] Using https://kumo-ui.com/ 💅
-  - [ ] Connect to GitHub
+    - [x] Strongly typed `import.meta.env` with https://arkenv.js.org/docs/vite-plugin/typing-import-meta-env#as-your-project-grows
+    - [ ] Have `src` and `worker` for clean types
+  - [x] Connect to GitHub
     - [ ] SCM needs to be persisted
   - [ ] Connect to Cloudflare
         _Should this just be a "Deploy to Cloudflare" button to run on your own infra, instead of multi-tenant?
         That would just require a Cloudflare API token..._
+  - [ ] Switch to [better-result](https://github.com/dmmulroy/better-result#handling-errors) to avoid `try/catch`
 
 - Pages
   - [ ] Deploy on push to `main`
@@ -79,6 +82,8 @@ The point isn't to test the _current_ implementation – but to **verify the des
   - [ ] Fork Bomb
 
 - DX
+  - [ ] When already connected (`/api/user`), just do a re-auth intead:
+        https://github.com/login/oauth/authorize?client_id=Iv23liYnu0jvlO0mxE4n
   - [ ] ❌ Cloudflare doesn't support OAuth clients (i.e. [Sign in with Cloudflare](https://x.com/ericclemmons/status/2032970074638692784))
   - [ ] Auto-detect `vite-plus`:
     - [ ] `vp check`, `vp test`, `vp build`
