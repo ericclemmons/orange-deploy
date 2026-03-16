@@ -15,6 +15,7 @@
     "@phosphor-icons/react": "catalog:",
     "@tailwindcss/vite": "catalog:",
     "@tanstack/react-router": "catalog:",
+    "agents": "catalog:",
     "arkenv": "catalog:",
     "arktype": "catalog:",
     "effect": "catalog:",

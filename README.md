@@ -60,7 +60,7 @@ The point isn't to test the _current_ implementation – but to **verify the des
     - [x] Strongly typed `import.meta.env` with https://arkenv.js.org/docs/vite-plugin/typing-import-meta-env#as-your-project-grows
     - [x] Have `src` and `worker` for clean types
   - [x] Connect to GitHub
-    - [ ] SCM needs to be persisted
+    - [x] SCM needs to be persisted
   - [ ] Connect to Cloudflare
         _Should this just be a "Deploy to Cloudflare" button to run on your own infra, instead of multi-tenant?
         That would just require a Cloudflare API token..._

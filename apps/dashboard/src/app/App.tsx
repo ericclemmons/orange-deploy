@@ -10,12 +10,23 @@ import {
   Text,
 } from "@cloudflare/kumo";
 import { CpuIcon, GithubLogoIcon, GlobeIcon } from "@phosphor-icons/react";
+import { useAgent } from "agents/react";
+import { useState } from "react";
 
-import heroImg from "./assets/hero.png";
+import type { BuildsAgent, BuildsState } from "../worker/BuildsAgent";
 
 import "./App.css";
+import heroImg from "./assets/hero.png";
 
 function App() {
+  const [state, setState] = useState<BuildsState>();
+
+  useAgent<BuildsAgent, BuildsState>({
+    agent: "builds-agent",
+    name: import.meta.env.VITE_CLOUDFLARE_ACCOUNT_ID,
+    onStateUpdate: (state) => setState(state),
+  });
+
   return (
     <>
       <div id="spacer" />
@@ -49,8 +60,13 @@ function App() {
           <Flow.Node
             render={
               <Link href="/api/auth/github" variant="plain">
-                <Button icon={<GithubLogoIcon />} variant="primary">
-                  Connect to GitHub
+                <Button
+                  disabled={!state}
+                  icon={<GithubLogoIcon />}
+                  loading={!state}
+                  variant="primary"
+                >
+                  {state?.githubInstallationId ? "Update GitHub App" : "Connect to GitHub"}
                   <Link.ExternalIcon />
                 </Button>
               </Link>
@@ -58,13 +74,12 @@ function App() {
           />
 
           <Flow.Node
-            disabled
+            disabled={!state?.githubInstallationId}
             render={
               <div>
-                <Combobox disabled>
+                <Combobox disabled={!state?.githubInstallationId}>
                   <Combobox.TriggerInput placeholder="Select a Repository" />
                   <Combobox.Content>
-                    <Combobox.Empty />
                     <Combobox.Item value="1">Repository 1</Combobox.Item>
                     <Combobox.Item value="2">Repository 2</Combobox.Item>
                     <Combobox.Item value="3">Repository 3</Combobox.Item>
