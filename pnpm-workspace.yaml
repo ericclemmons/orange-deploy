@@ -6,12 +6,13 @@ packages:
 
 catalog:
   "@arkenv/vite-plugin": ^0.0.32
+  "@babel/plugin-proposal-decorators": ^7.29.0
   "@cloudflare/kumo": ^1.12.1
   "@cloudflare/vite-plugin": ^1.28.0
   "@cloudflare/workers-types": ^4.20260313.1
   "@hono/oauth-providers": ^0.8.5
-  "@octokit/app": ^16.1.2
   "@phosphor-icons/react": ^2.1.10
+  "@rolldown/plugin-babel": ^0.2.1
   "@tailwindcss/vite": ^4.2.1
   "@tanstack/react-router": ^1.167.0
   "@types/node": ^24
@@ -20,6 +21,7 @@ catalog:
   arktype: ^2.2.0
   effect: 4.0.0-beta.31
   hono: ^4.12.8
+  octokit: ^5.0.5
   tailwindcss: ^4.2.1
   typescript: ^5
   vite: npm:@voidzero-dev/vite-plus-core@latest

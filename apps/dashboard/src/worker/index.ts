@@ -1,5 +1,6 @@
 import { githubAuth } from "@hono/oauth-providers/github";
 import { getAgentByName, routeAgentRequest } from "agents";
+import { type } from "arktype";
 import { env } from "cloudflare:workers";
 import { Hono } from "hono";
 import { getCookie, setCookie } from "hono/cookie";
@@ -31,8 +32,10 @@ app.get(
       jwtPayload: c.get("jwtPayload"),
     });
 
-    const { installation_id, setup_action } = c.req.query();
-    console.info({ installation_id, setup_action });
+    const { installation_id, setup_action } = type({
+      installation_id: "string.numeric.parse",
+      setup_action: "'install' | 'update'",
+    }).assert(c.req.query());
 
     if (["install", "update"].includes(setup_action)) {
       const agent = await getAgentByName<Env, BuildsAgent>(

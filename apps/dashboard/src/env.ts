@@ -3,6 +3,8 @@
 import { type } from "arkenv";
 
 export const Env = type({
+  GITHUB_APP_ID: "string",
+  GITHUB_APP_PRIVATE_KEY: "string",
   GITHUB_CLIENT_ID: "string",
   GITHUB_CLIENT_SECRET: "string",
   JWT_SECRET: "string",

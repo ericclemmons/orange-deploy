@@ -11,7 +11,6 @@
     "@cloudflare/kumo": "catalog:",
     "@cloudflare/vite-plugin": "catalog:",
     "@hono/oauth-providers": "catalog:",
-    "@octokit/app": "catalog:",
     "@phosphor-icons/react": "catalog:",
     "@tailwindcss/vite": "catalog:",
     "@tanstack/react-router": "catalog:",
@@ -20,12 +19,15 @@
     "arktype": "catalog:",
     "effect": "catalog:",
     "hono": "catalog:",
+    "octokit": "catalog:",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "tailwindcss": "catalog:"
   },
   "devDependencies": {
+    "@babel/plugin-proposal-decorators": "catalog:",
     "@eslint/js": "^9.39.4",
+    "@rolldown/plugin-babel": "catalog:",
     "@types/node": "^24.12.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",

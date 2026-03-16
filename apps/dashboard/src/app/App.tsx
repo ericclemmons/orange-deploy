@@ -11,7 +11,7 @@ import {
 } from "@cloudflare/kumo";
 import { CpuIcon, GithubLogoIcon, GlobeIcon } from "@phosphor-icons/react";
 import { useAgent } from "agents/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import type { BuildsAgent, BuildsState } from "../worker/BuildsAgent";
 
@@ -20,12 +20,17 @@ import heroImg from "./assets/hero.png";
 
 function App() {
   const [state, setState] = useState<BuildsState>();
+  const [repos, setRepos] = useState<string[]>();
 
-  useAgent<BuildsAgent, BuildsState>({
+  const agent = useAgent<BuildsAgent, BuildsState>({
     agent: "builds-agent",
     name: import.meta.env.VITE_CLOUDFLARE_ACCOUNT_ID,
     onStateUpdate: (state) => setState(state),
   });
+
+  useEffect(() => {
+    agent.stub.listRepos().then(setRepos).catch(console.error);
+  }, [state?.githubInstallationId]);
 
   return (
     <>
@@ -77,12 +82,16 @@ function App() {
             disabled={!state?.githubInstallationId}
             render={
               <div>
-                <Combobox disabled={!state?.githubInstallationId}>
+                <Combobox disabled={!repos}>
                   <Combobox.TriggerInput placeholder="Select a Repository" />
                   <Combobox.Content>
-                    <Combobox.Item value="1">Repository 1</Combobox.Item>
-                    <Combobox.Item value="2">Repository 2</Combobox.Item>
-                    <Combobox.Item value="3">Repository 3</Combobox.Item>
+                    <Combobox.List>
+                      {repos?.map((repo) => (
+                        <Combobox.Item key={repo} value={repo}>
+                          {repo}
+                        </Combobox.Item>
+                      ))}
+                    </Combobox.List>
                   </Combobox.Content>
                 </Combobox>
               </div>
