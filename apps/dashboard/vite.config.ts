@@ -13,6 +13,7 @@ export default defineConfig({
     tasks: {
       dev: {
         command: "vp dev",
+        dependsOn: ["types"],
       },
       types: {
         command: "wrangler types",
