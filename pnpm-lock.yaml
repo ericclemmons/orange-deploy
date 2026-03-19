@@ -21,6 +21,9 @@ catalogs:
     '@hono/oauth-providers':
       specifier: ^0.8.5
       version: 0.8.5
+    '@hono/standard-validator':
+      specifier: ^0.2.2
+      version: 0.2.2
     '@phosphor-icons/react':
       specifier: ^2.1.10
       version: 2.1.10
@@ -48,6 +51,9 @@ catalogs:
     hono:
       specifier: ^4.12.8
       version: 4.12.8
+    immer:
+      specifier: ^11.1.4
+      version: 11.1.4
     octokit:
       specifier: ^5.0.5
       version: 5.0.5
@@ -87,6 +93,9 @@ importers:
       '@hono/oauth-providers':
         specifier: 'catalog:'
         version: 0.8.5(hono@4.12.8)
+      '@hono/standard-validator':
+        specifier: 'catalog:'
+        version: 0.2.2(@standard-schema/spec@1.1.0)(hono@4.12.8)
       '@phosphor-icons/react':
         specifier: 'catalog:'
         version: 2.1.10(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
@@ -111,6 +120,9 @@ importers:
       hono:
         specifier: 'catalog:'
         version: 4.12.8
+      immer:
+        specifier: 'catalog:'
+        version: 11.1.4
       octokit:
         specifier: 'catalog:'
         version: 5.0.5
@@ -651,6 +663,12 @@ packages:
     engines: {node: '>=18.4.0'}
     peerDependencies:
       hono: '>=3.0.0'
+
+  '@hono/standard-validator@0.2.2':
+    resolution: {integrity: sha512-mJ7W84Bt/rSvoIl63Ynew+UZOHAzzRAoAXb3JaWuxAkM/Lzg+ZHTCUiz77KOtn2e623WNN8LkD57Dk0szqUrIw==}
+    peerDependencies:
+      '@standard-schema/spec': ^1.0.0
+      hono: '>=3.9.0'
 
   '@humanfs/core@0.19.1':
     resolution: {integrity: sha512-5DyQ4+1JEUzejeK1JGICcideyfUbGixgS9jNgex5nqkW+cY7WZhxBigmieN5Qnw9ZosSNVC9KQKyb+GUaGyKUA==}
@@ -2360,6 +2378,9 @@ packages:
     resolution: {integrity: sha512-Hs59xBNfUIunMFgWAbGX5cq6893IbWg4KnrjbYwX3tx0ztorVgTDA6B2sxf8ejHJ4wz8BqGUMYlnzNBer5NvGg==}
     engines: {node: '>= 4'}
 
+  immer@11.1.4:
+    resolution: {integrity: sha512-XREFCPo6ksxVzP4E0ekD5aMdf8WMwmdNaz6vuvxgI40UaEiu6q3p8X52aU6GdyvLY3XXX/8R7JOTXStz/nBbRw==}
+
   import-fresh@3.3.1:
     resolution: {integrity: sha512-TR3KfrTZTYLPB6jUjfx6MF9WcWrHL9su5TObK4ZkYgBdWKPOFoSoQIdEuTuR82pmtxH2spWG9h6etwfr1pLBqQ==}
     engines: {node: '>=6'}
@@ -3817,6 +3838,11 @@ snapshots:
 
   '@hono/oauth-providers@0.8.5(hono@4.12.8)':
     dependencies:
+      hono: 4.12.8
+
+  '@hono/standard-validator@0.2.2(@standard-schema/spec@1.1.0)(hono@4.12.8)':
+    dependencies:
+      '@standard-schema/spec': 1.1.0
       hono: 4.12.8
 
   '@humanfs/core@0.19.1': {}
@@ -5382,6 +5408,8 @@ snapshots:
   ignore@5.3.2: {}
 
   ignore@7.0.5: {}
+
+  immer@11.1.4: {}
 
   import-fresh@3.3.1:
     dependencies:

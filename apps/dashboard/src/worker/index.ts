@@ -1,4 +1,5 @@
 import { githubAuth } from "@hono/oauth-providers/github";
+import { sValidator } from "@hono/standard-validator";
 import { getAgentByName, routeAgentRequest } from "agents";
 import { type } from "arktype";
 import { env } from "cloudflare:workers";
@@ -8,8 +9,15 @@ import { csrf } from "hono/csrf";
 import { HTTPException } from "hono/http-exception";
 import { sign, verify } from "hono/jwt";
 
-import type { BuildsAgent } from "./BuildsAgent";
-export { BuildsAgent } from "./BuildsAgent";
+import type { AccountAgent } from "./AccountAgent";
+
+export { AccountAgent } from "./AccountAgent";
+
+const GitHubCallback = type({
+  code: "string",
+  installation_id: "string.numeric.parse",
+  setup_action: "'install' | 'update'",
+});
 
 const app = new Hono();
 
@@ -25,36 +33,24 @@ app.get(
     client_id: env.GITHUB_CLIENT_ID,
     client_secret: env.GITHUB_CLIENT_SECRET,
   }),
+  sValidator("query", GitHubCallback),
   async (c) => {
-    console.info({
-      scopes: c.get("granted-scopes"),
-      token: c.get("token"),
-      jwtPayload: c.get("jwtPayload"),
-    });
+    const { installation_id } = c.req.valid("query");
 
-    const { installation_id, setup_action } = type({
-      installation_id: "string.numeric.parse",
-      setup_action: "'install' | 'update'",
-    }).assert(c.req.query());
+    const account = await getAgentByName<Env, AccountAgent>(
+      env.AccountAgent,
+      env.VITE_CLOUDFLARE_ACCOUNT_ID,
+    );
 
-    if (["install", "update"].includes(setup_action)) {
-      const agent = await getAgentByName<Env, BuildsAgent>(
-        env.BuildsAgent,
-        env.VITE_CLOUDFLARE_ACCOUNT_ID,
-      );
-
-      await agent.setGithubInstallationId(installation_id);
-    }
+    await account.saveInstallation(installation_id);
 
     const user = c.get("user-github")!;
     const jwt = await sign({ installation_id, sub: user.id, login: user.login }, env.JWT_SECRET);
 
     setCookie(c, "session", jwt, {
+      maxAge: 2592000,
       httpOnly: true,
       secure: true,
-      sameSite: "lax",
-      path: "/",
-      maxAge: 2592000,
     });
 
     return c.redirect("/");

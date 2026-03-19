@@ -26,3 +26,5 @@ dist-ssr
 # Cloudflare
 .wrangler
 worker-configuration.d.ts
+# Localflare generated files
+.localflare/

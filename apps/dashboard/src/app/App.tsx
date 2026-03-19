@@ -1,36 +1,40 @@
 import {
   Button,
   CloudflareLogo,
-  Combobox,
   Flow,
   Grid,
   GridItem,
   Link,
+  Select,
   Surface,
   Text,
 } from "@cloudflare/kumo";
 import { CpuIcon, GithubLogoIcon, GlobeIcon } from "@phosphor-icons/react";
 import { useAgent } from "agents/react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
-import type { BuildsAgent, BuildsState } from "../worker/BuildsAgent";
+import type { AccountAgent, AccountState } from "../worker/AccountAgent";
 
 import "./App.css";
 import heroImg from "./assets/hero.png";
 
-function App() {
-  const [state, setState] = useState<BuildsState>();
-  const [repos, setRepos] = useState<string[]>();
+const ADD_GITHUB_ORGANIZATION = Symbol("add-github-organization");
 
-  const agent = useAgent<BuildsAgent, BuildsState>({
-    agent: "builds-agent",
+function App() {
+  const [account, setAccount] = useState<AccountState>();
+
+  useAgent<AccountAgent, AccountState>({
+    agent: "account-agent",
     name: import.meta.env.VITE_CLOUDFLARE_ACCOUNT_ID,
-    onStateUpdate: (state) => setState(state),
+    onStateUpdate: (state) => setAccount(state),
   });
 
-  useEffect(() => {
-    agent.stub.listRepos().then(setRepos).catch(console.error);
-  }, [state?.githubInstallationId]);
+  // Have to explicitly check for `login` because Octokit types don't include `organization-simple` schema
+  const accounts = account
+    ? Object.values(account.installations)
+        .map(({ account }) => (account && "login" in account ? account : null))
+        .filter((account) => account !== null)
+    : [];
 
   return (
     <>
@@ -64,36 +68,49 @@ function App() {
         <Flow align="center">
           <Flow.Node
             render={
-              <Link href="/api/auth/github" variant="plain">
-                <Button
-                  disabled={!state}
-                  icon={<GithubLogoIcon />}
-                  loading={!state}
-                  variant="primary"
+              <div>
+                <Select
+                  aria-label="Select an Organization"
+                  loading={!account}
+                  placeholder="Select an Organization"
                 >
-                  {state?.githubInstallationId ? "Update GitHub App" : "Connect to GitHub"}
-                  <Link.ExternalIcon />
-                </Button>
-              </Link>
+                  {accounts.map((account) => (
+                    <Select.Option key={account.id} value={account.login}>
+                      <div className="flex items-center gap-2">
+                        <img
+                          className="size-4 rounded"
+                          src={account.avatar_url}
+                          alt={`Avatar for ${account.login}`}
+                        />
+                        <Text>{account.login}</Text>
+                      </div>
+                    </Select.Option>
+                  ))}
+                  <Select.Option key="add-github-organization" value={ADD_GITHUB_ORGANIZATION}>
+                    <Link
+                      className="flex items-center gap-2!"
+                      href="/api/auth/github"
+                      variant="plain"
+                    >
+                      <GithubLogoIcon className="size-4 rounded" />
+                      <Text>Add GitHub Organization</Text>
+                    </Link>
+                  </Select.Option>
+                </Select>
+              </div>
             }
           />
 
           <Flow.Node
-            disabled={!state?.githubInstallationId}
+            disabled
             render={
               <div>
-                <Combobox disabled={!repos}>
-                  <Combobox.TriggerInput placeholder="Select a Repository" />
-                  <Combobox.Content>
-                    <Combobox.List>
-                      {repos?.map((repo) => (
-                        <Combobox.Item key={repo} value={repo}>
-                          {repo}
-                        </Combobox.Item>
-                      ))}
-                    </Combobox.List>
-                  </Combobox.Content>
-                </Combobox>
+                <Select
+                  disabled
+                  aria-label="Select a Repository"
+                  placeholder="Select a Repository"
+                  items={{}}
+                />
               </div>
             }
           />
