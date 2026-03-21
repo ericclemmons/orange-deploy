@@ -1,36 +1,41 @@
 packages:
   - apps/*
-  - exmaples/*
+  - examples/*
   - packages/*
   - tools/*
 
 catalog:
   "@arkenv/vite-plugin": ^0.0.32
   "@babel/plugin-proposal-decorators": ^7.29.0
-  "@cloudflare/kumo": ^1.12.1
-  "@cloudflare/vite-plugin": ^1.28.0
+  "@cloudflare/kumo": ^1.15.0
+  "@cloudflare/vite-plugin": ^1.30.0
   "@cloudflare/workers-types": ^4.20260313.1
   "@hono/oauth-providers": ^0.8.5
   "@hono/standard-validator": ^0.2.2
   "@phosphor-icons/react": ^2.1.10
-  "@rolldown/plugin-babel": ^0.2.1
-  "@tailwindcss/vite": ^4.2.1
-  "@tanstack/react-router": ^1.167.0
+  "@rolldown/plugin-babel": ^0.2.2
+  "@tailwindcss/vite": ^4.2.2
+  "@tanstack/query-core": ^5.91.2
+  "@tanstack/query-db-collection": ^1.0.30
+  "@tanstack/react-db": ^0.1.77
+  "@tanstack/react-query": ^5.94.5
+  "@tanstack/react-router": ^1.168.1
+  "@tanstack/router-plugin": ^1.167.2
   "@types/node": ^24
-  agents: ^0.7.6
+  agents: ^0.7.9
   arkenv: ^0.11.0
   arktype: ^2.2.0
   effect: 4.0.0-beta.31
   hono: ^4.12.8
   immer: ^11.1.4
   octokit: ^5.0.5
-  tailwindcss: ^4.2.1
+  tailwindcss: ^4.2.2
   typescript: ^5
   vite: npm:@voidzero-dev/vite-plus-core@latest
   vite-plugin-react-click-to-component: ^4.2.0
-  vite-plus: latest
+  vite-plus: ^0.1.13
   vitest: npm:@voidzero-dev/vite-plus-test@latest
-  wrangler: ^4.73.0
+  wrangler: ^4.76.0
 
 catalogMode: prefer
 

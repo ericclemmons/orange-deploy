@@ -61,6 +61,10 @@ The point isn't to test the _current_ implementation – but to **verify the des
     - [x] Have `src` and `worker` for clean types
   - [x] Connect to GitHub
     - [x] SCM needs to be persisted
+  - [x] Use TanStack Router for most state persistence
+  - [ ] Move API to `apps/api` & env to `packages/env`
+        https://developers.cloudflare.com/workers/development-testing/multi-workers/
+    - [ ] Use [portless](https://github.com/vercel-labs/portless) for dashboard.localhost & api.localhost
   - [ ] Connect to Cloudflare
         _Should this just be a "Deploy to Cloudflare" button to run on your own infra, instead of multi-tenant?
         That would just require a Cloudflare API token..._

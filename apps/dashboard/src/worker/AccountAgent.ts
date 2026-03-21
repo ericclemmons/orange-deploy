@@ -1,18 +1,22 @@
 import { Agent, callable } from "agents";
-import { env } from "cloudflare:workers";
 import { produce } from "immer";
-import { App } from "octokit";
 
-const github = new App({
-  appId: env.GITHUB_APP_ID,
-  privateKey: env.GITHUB_APP_PRIVATE_KEY,
-});
+import { githubApp } from "./githubApp";
 
-type Installation = Awaited<ReturnType<typeof github.octokit.rest.apps.getInstallation>>["data"];
+type Installation = Awaited<
+  ReturnType<typeof githubApp.octokit.rest.apps.getInstallation>
+>["data"] & {
+  // Octokit doesn't include `simple-organization` type, which has `account.login`
+  account: { login: string };
+};
 
 export type AccountState = {
   installations: Record<Installation["id"], Installation>;
 };
+
+export type SearchRepositoriesResponse = Awaited<
+  ReturnType<typeof githubApp.octokit.rest.search.repos>
+>["data"];
 
 export class AccountAgent extends Agent<Env, AccountState> {
   initialState: AccountState = {
@@ -20,8 +24,32 @@ export class AccountAgent extends Agent<Env, AccountState> {
   };
 
   async getInstallation(installation_id: number) {
-    const { data } = await github.octokit.rest.apps.getInstallation({
+    const { data } = await githubApp.octokit.rest.apps.getInstallation({
       installation_id,
+    });
+
+    return data as Installation;
+  }
+
+  @callable({ description: "Get a list of repositories for the current account" })
+  async searchRepositories(
+    installationId: Installation["id"],
+    name?: string,
+  ): Promise<SearchRepositoriesResponse> {
+    const installation = this.state.installations[installationId];
+
+    if (!installation) {
+      throw new Error(`Installation ${installationId} not found`);
+    }
+
+    const octokit = await githubApp.getInstallationOctokit(installationId);
+
+    const { data } = await octokit.rest.search.repos({
+      per_page: 10,
+      q: [`user:${installation.account.login}`, name ? `${name} in:name` : null]
+        .filter(Boolean)
+        .join(" "),
+      sort: "updated",
     });
 
     return data;
@@ -30,14 +58,9 @@ export class AccountAgent extends Agent<Env, AccountState> {
   @callable({ description: "Store a GitHub installation on the current account" })
   async saveInstallation(installation_id: Installation["id"]): Promise<Installation> {
     const installation = await this.getInstallation(installation_id);
-    console.info({ installation });
 
     this.setState(
       produce(this.state, (draft) => {
-        if (Array.isArray(draft.installations)) {
-          draft.installations = {};
-        }
-
         draft.installations[installation_id] = installation;
       }),
     );
