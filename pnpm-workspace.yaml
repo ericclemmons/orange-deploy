@@ -5,32 +5,43 @@ packages:
   - tools/*
 
 catalog:
-  "@arkenv/vite-plugin": ^0.0.32
+  "@arkenv/vite-plugin": "catalog:"
   "@babel/plugin-proposal-decorators": ^7.29.0
   "@cloudflare/kumo": ^1.15.0
-  "@cloudflare/vite-plugin": ^1.30.0
+  "@cloudflare/vite-plugin": "catalog:"
   "@cloudflare/workers-types": ^4.20260313.1
+  "@eslint/js": ^10.0.1
   "@hono/oauth-providers": ^0.8.5
   "@hono/standard-validator": ^0.2.2
   "@phosphor-icons/react": ^2.1.10
   "@rolldown/plugin-babel": ^0.2.2
-  "@tailwindcss/vite": ^4.2.2
-  "@tanstack/query-core": ^5.91.2
+  "@tailwindcss/vite": "catalog:"
+  "@tanstack/query-core": ^5.94.5
   "@tanstack/query-db-collection": ^1.0.30
   "@tanstack/react-db": ^0.1.77
   "@tanstack/react-query": ^5.94.5
   "@tanstack/react-router": ^1.168.1
   "@tanstack/router-plugin": ^1.167.2
   "@types/node": ^24
+  "@types/react": ^19.2.14
+  "@types/react-dom": ^19.2.3
+  "@vitejs/plugin-react": ^6.0.1
   agents: ^0.7.9
   arkenv: ^0.11.0
   arktype: ^2.2.0
   effect: 4.0.0-beta.31
+  eslint: ^10.1.0
+  eslint-plugin-react-hooks: ^7.0.1
+  eslint-plugin-react-refresh: ^0.5.2
+  globals: ^17.4.0
   hono: ^4.12.8
   immer: ^11.1.4
   octokit: ^5.0.5
+  react: ^19.2.4
+  react-dom: ^19.2.4
   tailwindcss: ^4.2.2
   typescript: ^5
+  typescript-eslint: ^8.57.1
   vite: npm:@voidzero-dev/vite-plus-core@latest
   vite-plugin-react-click-to-component: ^4.2.0
   vite-plus: ^0.1.13
