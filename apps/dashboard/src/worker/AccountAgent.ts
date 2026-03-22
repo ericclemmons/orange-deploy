@@ -19,6 +19,10 @@ export type SearchRepositoriesResponse = Awaited<
   ReturnType<typeof githubApp.octokit.rest.search.repos>
 >["data"];
 
+export type GetRepositoryResponse = Awaited<
+  ReturnType<typeof githubApp.octokit.rest.repos.get>
+>["data"];
+
 export type Repository = SearchRepositoriesResponse["items"][number];
 
 export class AccountAgent extends Agent<Env, AccountState> {
@@ -47,7 +51,9 @@ export class AccountAgent extends Agent<Env, AccountState> {
     }
 
     const octokit = await githubApp.getInstallationOctokit(installation.id);
-    return octokit.rest.repos.get({ owner, repo });
+    const { data } = await octokit.rest.repos.get({ owner, repo });
+
+    return data;
   }
 
   @callable({ description: "Get a list of repositories for the current account" })

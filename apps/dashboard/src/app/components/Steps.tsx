@@ -3,20 +3,25 @@ import { CpuIcon, GithubLogoIcon, GlobeIcon } from "@phosphor-icons/react";
 import { useIsFetching } from "@tanstack/react-query";
 import { Link as RouterLink, useNavigate } from "@tanstack/react-router";
 
-import type { AccountState, SearchRepositoriesResponse } from "../../worker/AccountAgent";
+import type {
+  AccountState,
+  GetRepositoryResponse,
+  SearchRepositoriesResponse,
+} from "../../worker/AccountAgent";
 
 type Organization = AccountState["installations"][number]["account"];
-type Repository = SearchRepositoriesResponse["items"][number];
+type Repository = GetRepositoryResponse | SearchRepositoriesResponse["items"][number];
 
 export namespace Steps {
   export type Props = {
     organization?: Organization;
     organizations: Organization[];
+    repository?: Repository;
     repositories?: Repository[];
   };
 }
 
-export function Steps({ organization, organizations, repositories }: Steps.Props) {
+export function Steps({ organization, organizations, repository, repositories }: Steps.Props) {
   const navigate = useNavigate();
   const isFetching = useIsFetching({
     queryKey: ["repositories", { organization: organization?.login }],
@@ -46,29 +51,13 @@ export function Steps({ organization, organizations, repositories }: Steps.Props
               }}
               value={organization ?? null}
             >
-              <Combobox.TriggerValue placeholder="Select an Organization" className="w-[200px]">
-                {organization ? (
-                  <div className="flex items-center gap-2!">
-                    <img
-                      className="size-4 rounded"
-                      src={organization.avatar_url}
-                      alt={`Avatar for ${organization.login}`}
-                    />
-                    <Text>{organization.login}</Text>
-                  </div>
-                ) : (
-                  <Text>Select an Organization</Text>
-                )}
-              </Combobox.TriggerValue>
-              {/* <Combobox.TriggerInput placeholder="Select an Organization" /> */}
+              <Combobox.TriggerInput placeholder="Select an Organization" />
               <Combobox.Content>
                 <Combobox.Empty>
                   <Text variant="error" size="xs">
                     No matching organizations installed.
                   </Text>
                 </Combobox.Empty>
-
-                <Combobox.Input />
 
                 <Combobox.List>
                   {organizations.map((organization) => (
@@ -107,6 +96,7 @@ export function Steps({ organization, organizations, repositories }: Steps.Props
           <div>
             <Combobox<Repository>
               disabled={!organization}
+              itemToStringLabel={(repository) => repository.name}
               onInputValueChange={(repo) =>
                 navigate({
                   params: { orgName: organization?.login ?? "" },
@@ -116,6 +106,7 @@ export function Steps({ organization, organizations, repositories }: Steps.Props
                 })
               }
               items={repositories}
+              value={repository ?? null}
             >
               <Combobox.TriggerInput
                 render={() => (
@@ -158,12 +149,19 @@ export function Steps({ organization, organizations, repositories }: Steps.Props
         }
       />
 
-      <Flow.Node disabled render={<Button disabled>Checks</Button>} />
+      <Flow.Node
+        disabled={!repository}
+        render={
+          <Button disabled={!repository} variant={repository ? "primary" : undefined}>
+            Builds
+          </Button>
+        }
+      />
 
       <Flow.Node
         disabled
         render={
-          <Button disabled icon={<CpuIcon />} variant="primary">
+          <Button disabled icon={<CpuIcon />}>
             Deploy
           </Button>
         }

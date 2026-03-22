@@ -65,13 +65,15 @@ function SelectRepositoryRoute() {
       const byOrganization = q
         .from({ collection })
         .where(({ collection }) => eq(collection.owner?.login, organization.login))
-        .orderBy(({ collection }) => collection.name);
+        .orderBy(({ collection }) => collection.score, "desc");
 
       if (!search.repo) {
         return byOrganization;
       }
 
-      return byOrganization.where(({ collection }) => like(collection.name, `${search.repo}%`));
+      return byOrganization
+        .where(({ collection }) => like(collection.name, `%${search.repo}%`))
+        .orderBy(({ collection }) => collection.score, "desc");
     },
     [organization, search.repo],
   );

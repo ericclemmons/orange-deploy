@@ -1,4 +1,4 @@
-import { CloudflareLogo, Grid, GridItem, Surface, Text } from "@cloudflare/kumo";
+import { CloudflareLogo, Grid, GridItem, Text } from "@cloudflare/kumo";
 import { GithubLogoIcon } from "@phosphor-icons/react";
 import { Outlet, Link as RouterLink, createRootRouteWithContext } from "@tanstack/react-router";
 import * as React from "react";
@@ -21,7 +21,7 @@ function RootComponent() {
 
       <div className="ticks"></div>
 
-      <Surface className="p-16">
+      <div className="p-16">
         <Grid variant="side-by-side">
           <GridItem>
             <RouterLink to="/">
@@ -38,13 +38,13 @@ function RootComponent() {
             </div>
           </GridItem>
         </Grid>
-      </Surface>
+      </div>
 
       <div className="ticks"></div>
 
-      <Surface className="p-16 flex flex-col items-center">
+      <div className="p-16 flex flex-col items-center">
         <Outlet />
-      </Surface>
+      </div>
 
       <div className="ticks"></div>
     </React.Fragment>
