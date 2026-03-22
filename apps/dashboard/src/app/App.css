@@ -38,7 +38,7 @@
 
 #spacer {
   height: 88px;
-  border-top: 1px solid var(--border);
+  border-top: 0.5px solid var(--border);
   @media (max-width: 1024px) {
     height: 48px;
   }
@@ -47,6 +47,8 @@
 .ticks {
   position: relative;
   width: 100%;
+
+  border-bottom: 0.5px solid var(--border);
 
   &::before,
   &::after {
