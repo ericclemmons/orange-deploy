@@ -1,22 +1,19 @@
 import { AgentClient } from "agents/client";
 
-export function loadAgent<AgentState>(agent: string, name?: string) {
+export async function loadAgent<AgentState>(agent: string, name?: string) {
   const { promise, resolve, reject } = Promise.withResolvers<AgentState>();
-  const { host } = window.location;
 
   const client = new AgentClient<AgentState>({
     agent,
+    host: window.location.host,
     name,
-    host,
-    onStateUpdateError: (error) => {
-      client.close();
-      reject(error);
-    },
-    onStateUpdate: (state) => {
-      client.close();
-      resolve(state);
-    },
+    onStateUpdateError: reject,
+    onStateUpdate: resolve,
   });
 
-  return promise;
+  return {
+    client,
+    state: await promise,
+    [Symbol.dispose]: () => client.close(),
+  };
 }

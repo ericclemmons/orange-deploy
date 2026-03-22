@@ -7,18 +7,18 @@ import { loadAgent } from "../utils/loadAgent";
 
 export const Route = createFileRoute("/_account")({
   beforeLoad: async () => {
-    const account = await loadAgent<AccountState>(
+    using agent = await loadAgent<AccountState>(
       "account-agent",
       import.meta.env.VITE_CLOUDFLARE_ACCOUNT_ID,
     );
 
-    const organizations = account
-      ? Object.values(account.installations)
+    const organizations = agent.state
+      ? Object.values(agent.state.installations)
           .map(({ account }) => account)
           .toSorted((a, b) => a.login.localeCompare(b.login))
       : [];
 
-    return { account, organizations };
+    return { account: agent.state, organizations };
   },
   component: AccountLayout,
   pendingComponent: Loader,

@@ -11,12 +11,15 @@ type Installation = Awaited<
 };
 
 export type AccountState = {
+  // TODO: This should've been done by `organization.login` for ease
   installations: Record<Installation["id"], Installation>;
 };
 
 export type SearchRepositoriesResponse = Awaited<
   ReturnType<typeof githubApp.octokit.rest.search.repos>
 >["data"];
+
+export type Repository = SearchRepositoriesResponse["items"][number];
 
 export class AccountAgent extends Agent<Env, AccountState> {
   initialState: AccountState = {
@@ -29,6 +32,22 @@ export class AccountAgent extends Agent<Env, AccountState> {
     });
 
     return data as Installation;
+  }
+
+  @callable({ description: "Get a single repository from GitHub" })
+  async getRepository(owner: Installation["account"]["login"], repo: string) {
+    // TODO: This should be some AuthZ wrapper/middleware that can be used for multiple callabout methods.
+    // The goal is to ensure any calls are scoped to this account's approved installations.
+    const installation = Object.values(this.state.installations).find(
+      ({ account }) => account.login === owner,
+    );
+
+    if (!installation) {
+      throw new Error(`You do not have access to ${owner}`);
+    }
+
+    const octokit = await githubApp.getInstallationOctokit(installation.id);
+    return octokit.rest.repos.get({ owner, repo });
   }
 
   @callable({ description: "Get a list of repositories for the current account" })
