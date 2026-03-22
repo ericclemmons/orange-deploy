@@ -33,20 +33,22 @@ export class AccountAgent extends Agent<Env, AccountState> {
 
   @callable({ description: "Get a list of repositories for the current account" })
   async searchRepositories(
-    installationId: Installation["id"],
-    name?: string,
+    orgName: Installation["account"]["login"],
+    repoName?: string,
   ): Promise<SearchRepositoriesResponse> {
-    const installation = this.state.installations[installationId];
+    const installation = Object.values(this.state.installations).find(
+      ({ account }) => account.login === orgName,
+    );
 
     if (!installation) {
-      throw new Error(`Installation ${installationId} not found`);
+      throw new Error(`You do not have access to ${orgName}`);
     }
 
-    const octokit = await githubApp.getInstallationOctokit(installationId);
+    const octokit = await githubApp.getInstallationOctokit(installation.id);
 
     const { data } = await octokit.rest.search.repos({
       per_page: 10,
-      q: [`user:${installation.account.login}`, name ? `${name} in:name` : null]
+      q: [`user:${installation.account.login}`, repoName ? `${repoName} in:name` : null]
         .filter(Boolean)
         .join(" "),
       sort: "updated",
