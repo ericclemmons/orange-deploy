@@ -7,7 +7,7 @@ import {
   Text,
   useKumoToastManager,
 } from "@cloudflare/kumo";
-import { PackageIcon, PlayIcon } from "@phosphor-icons/react";
+import { PackageIcon, PlayIcon, TrashIcon } from "@phosphor-icons/react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useAgent } from "agents/react";
@@ -101,12 +101,24 @@ function RouteComponent() {
     onSuccess: () => listBuilds.refetch(),
   });
 
+  const deleteBuild = useMutation({
+    mutationFn: project.stub.deleteBuild,
+    mutationKey: [
+      "project.deleteBuild",
+      { organization: organization.login, repository: repository.name },
+    ],
+    onError: (error, data) => toast.add({ data, description: error.message, variant: "error" }),
+    onSuccess: (description, data) => {
+      toast.add({ data, description, variant: "success" });
+      return listBuilds.refetch();
+    },
+  });
+
   const deleteBuilds = useMutation({
     mutationFn: project.stub.deleteBuilds,
     onError: (error, data) => toast.add({ data, description: error.message, variant: "warning" }),
     onSuccess: (description, data) => {
       toast.add({ data, description, variant: "success" });
-
       return listBuilds.refetch();
     },
   });
@@ -162,9 +174,9 @@ function RouteComponent() {
                 <BuildRow
                   // @ts-ignore Errors with `vp check --fx`, but not Cursor 🤔
                   key={workflow.workflowId}
+                  onDelete={(workflowId) => deleteBuild.mutate(workflowId)}
                   // @ts-ignore Errors with `vp check --fx`, but not Cursor 🤔
                   progress={state.progress[workflow.workflowId]}
-                  project={project}
                   workflow={workflow}
                 />
               ))}
@@ -183,6 +195,7 @@ function RouteComponent() {
         <LayerCard.Secondary>
           <div className="grow" />
           <Button
+            icon={<TrashIcon />}
             disabled={deleteBuilds.isPending}
             onClick={() =>
               deleteBuilds.mutate({ status: ["terminated", "errored", "unknown", "complete"] })

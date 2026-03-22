@@ -1,43 +1,34 @@
-import {
-  Badge,
-  Button,
-  DropdownMenu,
-  Loader,
-  Table,
-  Text,
-  Tooltip,
-  useKumoToastManager,
-} from "@cloudflare/kumo";
+import { Badge, Button, DropdownMenu, Link, Loader, Table, Text, Tooltip } from "@cloudflare/kumo";
 import { DotsThreeIcon } from "@phosphor-icons/react";
-import { useMutation } from "@tanstack/react-query";
-import type { useAgent } from "agents/react";
 
 import type { BuildWorkflowProgress } from "../../worker/BuildWorkflow";
-import type { BuildWorkflowInfo, ProjectAgent, ProjectState } from "../../worker/ProjectAgent";
+import type { BuildWorkflowInfo } from "../../worker/ProjectAgent";
 
 export namespace BuildRow {
   export type Props = {
+    onDelete: (workflowId: string) => void;
     progress?: BuildWorkflowProgress;
-    project: ReturnType<typeof useAgent<ProjectAgent, ProjectState>>;
     workflow: BuildWorkflowInfo;
   };
 }
 
-export function BuildRow({ progress, project, workflow }: BuildRow.Props) {
-  const toast = useKumoToastManager();
-  const deleteBuild = useMutation({
-    mutationFn: project.stub.deleteBuild,
-    mutationKey: ["project.deleteBuild", workflow.workflowId],
-    onError: (error, data) => toast.add({ data, description: error.message, variant: "error" }),
-    onSuccess: (description, data) => toast.add({ data, description, variant: "success" }),
-  });
-
+export function BuildRow({ onDelete, progress, workflow }: BuildRow.Props) {
   return (
     <Table.Row key={workflow.workflowId}>
       <Table.Cell>
-        <Text variant="mono">{workflow.metadata?.branch}</Text>
+        <Text variant="mono">
+          <Link
+            href={`https://github.com/${workflow.metadata?.owner}/${workflow.metadata?.repo}/tree/${workflow.metadata?.branch}`}
+          >
+            {workflow.metadata?.branch} <Link.ExternalIcon />
+          </Link>
+        </Text>
       </Table.Cell>
-      <Table.Cell>{workflow.metadata?.commit.commit.message}</Table.Cell>
+      <Table.Cell>
+        <Link href={workflow.metadata?.commit.html_url}>
+          {workflow.metadata?.commit.commit.message} <Link.ExternalIcon />
+        </Link>
+      </Table.Cell>
       <Table.Cell>{new Date(workflow.createdAt).toLocaleString()}</Table.Cell>
       <Table.Cell>
         {(() => {
@@ -49,7 +40,7 @@ export function BuildRow({ progress, project, workflow }: BuildRow.Props) {
               return <Badge variant="destructive">Terminated</Badge>;
             case "errored":
               return (
-                <Tooltip content={workflow.error?.message}>
+                <Tooltip content={workflow.error?.message} side="left">
                   <Badge variant="destructive">Errored</Badge>
                 </Tooltip>
               );
@@ -91,11 +82,7 @@ export function BuildRow({ progress, project, workflow }: BuildRow.Props) {
           />
 
           <DropdownMenu.Content align="end">
-            <DropdownMenu.Item
-              disabled={deleteBuild.isPending}
-              onClick={() => deleteBuild.mutate(workflow.workflowId)}
-              variant="danger"
-            >
+            <DropdownMenu.Item onClick={() => onDelete(workflow.workflowId)} variant="danger">
               Remove
             </DropdownMenu.Item>
           </DropdownMenu.Content>
