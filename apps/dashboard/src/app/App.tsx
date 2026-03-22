@@ -1,9 +1,13 @@
+import { ToastProvider } from "@cloudflare/kumo";
 import { RouterProvider } from "@tanstack/react-router";
 
+import "./App.css";
 import { router } from "./router";
 
-import "./App.css";
-
 export function App() {
-  return <RouterProvider router={router} />;
+  return (
+    <ToastProvider>
+      <RouterProvider router={router} />
+    </ToastProvider>
+  );
 }

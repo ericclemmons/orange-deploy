@@ -1,8 +1,21 @@
-import { Button, LayerCard, Table, Text } from "@cloudflare/kumo";
-import { CheckIcon, PlayIcon } from "@phosphor-icons/react";
+import {
+  Button,
+  Empty,
+  LayerCard,
+  Loader,
+  Table,
+  Text,
+  useKumoToastManager,
+} from "@cloudflare/kumo";
+import { PackageIcon, PlayIcon } from "@phosphor-icons/react";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
+import { useAgent } from "agents/react";
+import { Activity, useState } from "react";
 
 import { type AccountState, type GetRepositoryResponse } from "../../worker/AccountAgent";
+import type { BuildWorkflowInfo, ProjectAgent, ProjectState } from "../../worker/ProjectAgent";
+import { BuildRow } from "../components/BuildRow";
 import { Steps } from "../components/Steps";
 import { loadAgent } from "../utils/loadAgent";
 
@@ -22,43 +35,81 @@ export const Route = createFileRoute("/_account/$orgName/$repoName")({
     return { repository };
   },
   component: RouteComponent,
+  pendingComponent: Loader,
 });
 
-const emailData = [
-  {
-    id: "1",
-    subject: "Kumo v1.0.0 released",
-    from: "Visal In",
-    date: "5 seconds ago",
-  },
-  {
-    id: "2",
-    subject: "New Job Offer",
-    from: "Cloudflare",
-    date: "10 minutes ago",
-  },
-  {
-    id: "3",
-    subject: "Daily Email Digest",
-    from: "Cloudflare",
-    date: "1 hour ago",
-    tags: ["promotion"],
-  },
-  {
-    id: "4",
-    subject: "GitLab - New Comment",
-    from: "Rob Knecht",
-    date: "1 day ago",
-  },
-  {
-    id: "5",
-    subject: "Out of Office",
-    from: "Johnnie Lappen",
-    date: "3 days ago",
-  },
-];
 function RouteComponent() {
+  const [state, setState] = useState<ProjectState>({ progress: {} });
+  const toast = useKumoToastManager();
   const { organization, organizations, repository } = Route.useRouteContext();
+  const project = useAgent<ProjectAgent, ProjectState>({
+    agent: "project-agent",
+    name: `${organization.login}.${repository.name}`,
+    onError: (error) => toast.add({ description: error.type, variant: "error" }),
+    onMessage: (message) => {
+      console.debug("onMessage", message);
+      return listBuilds.refetch();
+    },
+    onStateUpdate: (state, source) => {
+      setState(state);
+      console.debug("onStateUpdate", state, source);
+      // TODO: Use a collection to optimistically update the build list
+      return listBuilds.refetch();
+    },
+  });
+
+  // @ts-ignore Errors with `vp check --fx`, but not Cursor 🤔
+  const listBuilds = useQuery({
+    // @ts-ignore Errors with `vp check --fx`, but not Cursor 🤔
+    placeholderData: { total: 0, nextCursor: null, workflows: [] },
+    // @ts-ignore Errors with `vp check --fx`, but not Cursor 🤔
+    queryFn: project.stub.listBuilds,
+    queryKey: ["project.workflows", project.name],
+    // Have to recast to `BuildWorkflowInfo` due to serialization
+    // 🙋 I thought capnweb solved this problem?
+    select: (page) => ({
+      ...page,
+      // @ts-ignore Errors with `vp check --fx`, but not Cursor 🤔
+      workflows: page.workflows.map((w) => w as unknown as BuildWorkflowInfo),
+    }),
+  });
+
+  const createBuild = useMutation({
+    mutationFn: ({ branch, commit }: { branch?: string; commit?: string }) =>
+      project.stub.createBuild({
+        owner: organization.login,
+        repo: repository.name,
+        branch: branch ?? repository.default_branch,
+        commit: commit ?? undefined,
+      }),
+    mutationKey: [
+      "project.createBuild",
+      {
+        organization: organization.login,
+        repository: repository.name,
+        branch: repository.default_branch,
+      },
+    ],
+    onError: (error, data) => {
+      toast.add({
+        description: error.message,
+        data,
+        title: "Error creating build",
+        variant: "error",
+      });
+    },
+    onSuccess: () => listBuilds.refetch(),
+  });
+
+  const deleteBuilds = useMutation({
+    mutationFn: project.stub.deleteBuilds,
+    onError: (error, data) => toast.add({ data, description: error.message, variant: "warning" }),
+    onSuccess: (description, data) => {
+      toast.add({ data, description, variant: "success" });
+
+      return listBuilds.refetch();
+    },
+  });
 
   return (
     <>
@@ -72,11 +123,16 @@ function RouteComponent() {
       <LayerCard>
         <LayerCard.Secondary>
           <Text variant="secondary">
-            <Text variant="mono">0</Text> Builds
+            <Text variant="mono">{listBuilds.data?.total}</Text> Builds
           </Text>
           <div className="grow" />
-          <Button variant="primary" size="sm">
-            <PlayIcon />
+          <Button
+            disabled={createBuild.isPending}
+            onClick={() => createBuild.mutate({ branch: repository.default_branch })}
+            variant="primary"
+            size="sm"
+          >
+            {createBuild.isPending ? <Loader size="sm" /> : <PlayIcon />}
             Build{" "}
             <Text
               // @ts-expect-error className does not exist on Text
@@ -95,23 +151,48 @@ function RouteComponent() {
                 <Table.Head>Branch</Table.Head>
                 <Table.Head>Commit</Table.Head>
                 <Table.Head>Created</Table.Head>
-                <Table.Head>Status</Table.Head>
+                <Table.Head className="w-0">Status</Table.Head>
+                <Table.Head className="w-0">
+                  <span className="sr-only">Actions</span>
+                </Table.Head>
               </Table.Row>
             </Table.Header>
             <Table.Body>
-              {emailData.slice(0, 3).map((row) => (
-                <Table.Row key={row.id}>
-                  <Table.Cell>{row.subject}</Table.Cell>
-                  <Table.Cell>{row.from}</Table.Cell>
-                  <Table.Cell>{row.date}</Table.Cell>
-                  <Table.Cell>
-                    <CheckIcon />
-                  </Table.Cell>
-                </Table.Row>
+              {listBuilds.data?.workflows.map((workflow) => (
+                <BuildRow
+                  // @ts-ignore Errors with `vp check --fx`, but not Cursor 🤔
+                  key={workflow.workflowId}
+                  // @ts-ignore Errors with `vp check --fx`, but not Cursor 🤔
+                  progress={state.progress[workflow.workflowId]}
+                  project={project}
+                  workflow={workflow}
+                />
               ))}
             </Table.Body>
           </Table>
+
+          <Activity mode={listBuilds.data?.workflows.length === 0 ? "visible" : "hidden"}>
+            <Empty
+              description="Start your first build by pushing to your repository. Or, manually trigger a build above."
+              icon={<PackageIcon size={48} />}
+              title="Ready to build!"
+            />
+          </Activity>
         </LayerCard.Primary>
+
+        <LayerCard.Secondary>
+          <div className="grow" />
+          <Button
+            disabled={deleteBuilds.isPending}
+            onClick={() =>
+              deleteBuilds.mutate({ status: ["terminated", "errored", "unknown", "complete"] })
+            }
+            size="sm"
+            variant="secondary-destructive"
+          >
+            Cleanup Builds
+          </Button>
+        </LayerCard.Secondary>
       </LayerCard>
     </>
   );

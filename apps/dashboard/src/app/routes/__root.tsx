@@ -1,6 +1,11 @@
 import { CloudflareLogo, Grid, GridItem, Text } from "@cloudflare/kumo";
 import { GithubLogoIcon } from "@phosphor-icons/react";
-import { Outlet, Link as RouterLink, createRootRouteWithContext } from "@tanstack/react-router";
+import {
+  ErrorComponent,
+  Outlet,
+  Link as RouterLink,
+  createRootRouteWithContext,
+} from "@tanstack/react-router";
 import * as React from "react";
 
 import type { AccountState } from "../../worker/AccountAgent";
@@ -12,6 +17,7 @@ interface RouteContext {
 
 export const Route = createRootRouteWithContext<RouteContext>()({
   component: RootComponent,
+  errorComponent: ErrorComponent,
 });
 
 function RootComponent() {

@@ -38,10 +38,7 @@ export class AccountAgent extends Agent<Env, AccountState> {
     return data as Installation;
   }
 
-  @callable({ description: "Get a single repository from GitHub" })
-  async getRepository(owner: Installation["account"]["login"], repo: string) {
-    // TODO: This should be some AuthZ wrapper/middleware that can be used for multiple callabout methods.
-    // The goal is to ensure any calls are scoped to this account's approved installations.
+  getInstallationByOwner(owner: Installation["account"]["login"]) {
     const installation = Object.values(this.state.installations).find(
       ({ account }) => account.login === owner,
     );
@@ -50,7 +47,18 @@ export class AccountAgent extends Agent<Env, AccountState> {
       throw new Error(`You do not have access to ${owner}`);
     }
 
-    const octokit = await githubApp.getInstallationOctokit(installation.id);
+    return installation;
+  }
+
+  getOctokitByOwner(owner: Installation["account"]["login"]) {
+    const installation = this.getInstallationByOwner(owner);
+
+    return githubApp.getInstallationOctokit(installation.id);
+  }
+
+  @callable({ description: "Get a single repository from GitHub" })
+  async getRepository(owner: Installation["account"]["login"], repo: string) {
+    const octokit = await this.getOctokitByOwner(owner);
     const { data } = await octokit.rest.repos.get({ owner, repo });
 
     return data;
@@ -58,24 +66,14 @@ export class AccountAgent extends Agent<Env, AccountState> {
 
   @callable({ description: "Get a list of repositories for the current account" })
   async searchRepositories(
-    orgName: Installation["account"]["login"],
-    repoName?: string,
+    owner: Installation["account"]["login"],
+    repo?: string,
   ): Promise<SearchRepositoriesResponse> {
-    const installation = Object.values(this.state.installations).find(
-      ({ account }) => account.login === orgName,
-    );
-
-    if (!installation) {
-      throw new Error(`You do not have access to ${orgName}`);
-    }
-
-    const octokit = await githubApp.getInstallationOctokit(installation.id);
+    const octokit = await this.getOctokitByOwner(owner);
 
     const { data } = await octokit.rest.search.repos({
       per_page: 10,
-      q: [`user:${installation.account.login}`, repoName ? `${repoName} in:name` : null]
-        .filter(Boolean)
-        .join(" "),
+      q: [`user:${owner}`, repo ? `${repo} in:name` : null].filter(Boolean).join(" "),
       sort: "updated",
     });
 

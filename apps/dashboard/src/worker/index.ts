@@ -12,6 +12,8 @@ import { sign, verify } from "hono/jwt";
 import type { AccountAgent } from "./AccountAgent";
 
 export { AccountAgent } from "./AccountAgent";
+export { ProjectAgent } from "./ProjectAgent";
+export { BuildWorkflow } from "./BuildWorkflow";
 
 const GitHubCallback = type({
   code: "string",

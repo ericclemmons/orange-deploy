@@ -7,8 +7,14 @@
   "compatibility_date": "2026-03-12",
   "compatibility_flags": ["nodejs_compat"],
   "durable_objects": {
-    "bindings": [{ "class_name": "AccountAgent", "name": "AccountAgent" }],
+    "bindings": [
+      { "class_name": "AccountAgent", "name": "AccountAgent" },
+      { "class_name": "ProjectAgent", "name": "ProjectAgent" },
+    ],
   },
   "main": "src/worker/index.ts",
-  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["AccountAgent"] }],
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["AccountAgent", "ProjectAgent"] }],
+  "workflows": [
+    { "name": "BuildWorkflow", "class_name": "BuildWorkflow", "binding": "BuildWorkflow" },
+  ],
 }

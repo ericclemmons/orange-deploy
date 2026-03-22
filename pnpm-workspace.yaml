@@ -5,17 +5,17 @@ packages:
   - tools/*
 
 catalog:
-  "@arkenv/vite-plugin": "catalog:"
+  "@arkenv/vite-plugin": ^0.0.32
   "@babel/plugin-proposal-decorators": ^7.29.0
   "@cloudflare/kumo": ^1.15.0
-  "@cloudflare/vite-plugin": "catalog:"
+  "@cloudflare/vite-plugin": ^1.30.0
   "@cloudflare/workers-types": ^4.20260313.1
   "@eslint/js": ^10.0.1
   "@hono/oauth-providers": ^0.8.5
   "@hono/standard-validator": ^0.2.2
   "@phosphor-icons/react": ^2.1.10
   "@rolldown/plugin-babel": ^0.2.2
-  "@tailwindcss/vite": "catalog:"
+  "@tailwindcss/vite": ^4.2.2
   "@tanstack/query-core": ^5.94.5
   "@tanstack/query-db-collection": ^1.0.30
   "@tanstack/react-db": ^0.1.77

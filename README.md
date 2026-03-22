@@ -86,6 +86,7 @@ The point isn't to test the _current_ implementation – but to **verify the des
   - [ ] Fork Bomb
 
 - DX
+  - [ ] Knip to remove unused exports/types
   - [ ] `@cloudflare/vite-plugin` should build types on change to wrangler.json
   - [ ] When already connected (`/api/user`), just do a re-auth intead:
         https://github.com/login/oauth/authorize?client_id=Iv23liYnu0jvlO0mxE4n
