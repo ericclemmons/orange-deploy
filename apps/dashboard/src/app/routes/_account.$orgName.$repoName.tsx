@@ -169,12 +169,14 @@ function RouteComponent() {
                 </Table.Head>
               </Table.Row>
             </Table.Header>
+
             <Table.Body>
               {listBuilds.data?.workflows.map((workflow) => (
                 <BuildRow
                   // @ts-ignore Errors with `vp check --fx`, but not Cursor 🤔
                   key={workflow.workflowId}
-                  onDelete={(workflowId) => deleteBuild.mutate(workflowId)}
+                  onDelete={deleteBuild.mutate}
+                  onRetry={project.stub.retryBuild}
                   // @ts-ignore Errors with `vp check --fx`, but not Cursor 🤔
                   progress={state.progress[workflow.workflowId]}
                   workflow={workflow}

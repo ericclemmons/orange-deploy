@@ -1,5 +1,5 @@
 import { Badge, Button, DropdownMenu, Link, Loader, Table, Text, Tooltip } from "@cloudflare/kumo";
-import { DotsThreeIcon } from "@phosphor-icons/react";
+import { ArrowClockwiseIcon, DotsThreeIcon, TrashIcon } from "@phosphor-icons/react";
 
 import type { BuildWorkflowProgress } from "../../worker/BuildWorkflow";
 import type { BuildWorkflowInfo } from "../../worker/ProjectAgent";
@@ -7,12 +7,13 @@ import type { BuildWorkflowInfo } from "../../worker/ProjectAgent";
 export namespace BuildRow {
   export type Props = {
     onDelete: (workflowId: string) => void;
+    onRetry: (workflowId: string) => void;
     progress?: BuildWorkflowProgress;
     workflow: BuildWorkflowInfo;
   };
 }
 
-export function BuildRow({ onDelete, progress, workflow }: BuildRow.Props) {
+export function BuildRow({ onDelete, onRetry, progress, workflow }: BuildRow.Props) {
   return (
     <Table.Row key={workflow.workflowId}>
       <Table.Cell>
@@ -82,8 +83,19 @@ export function BuildRow({ onDelete, progress, workflow }: BuildRow.Props) {
           />
 
           <DropdownMenu.Content align="end">
-            <DropdownMenu.Item onClick={() => onDelete(workflow.workflowId)} variant="danger">
-              Remove
+            <DropdownMenu.Item
+              icon={ArrowClockwiseIcon}
+              onClick={() => onRetry(workflow.workflowId)}
+            >
+              Retry
+            </DropdownMenu.Item>
+            <DropdownMenu.Separator />
+            <DropdownMenu.Item
+              icon={TrashIcon}
+              onClick={() => onDelete(workflow.workflowId)}
+              variant="danger"
+            >
+              Delete Build
             </DropdownMenu.Item>
           </DropdownMenu.Content>
         </DropdownMenu>

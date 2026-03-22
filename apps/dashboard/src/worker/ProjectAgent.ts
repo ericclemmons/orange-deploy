@@ -40,6 +40,11 @@ export class ProjectAgent extends Agent<Env, ProjectState> {
     return this.runWorkflow("BuildWorkflow", { owner, repo, commit }, { metadata });
   }
 
+  @callable()
+  async retryBuild(workflowId: string) {
+    return this.restartWorkflow(workflowId);
+  }
+
   @callable({ description: "Get a list of workflows for the current project" })
   async listBuilds() {
     const page = this.getWorkflows({ workflowName: "BuildWorkflow" });
