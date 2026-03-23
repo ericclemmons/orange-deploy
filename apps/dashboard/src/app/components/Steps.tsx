@@ -1,5 +1,5 @@
 import { Button, Combobox, Flow, Link, Loader, Text } from "@cloudflare/kumo";
-import { CpuIcon, GithubLogoIcon, GlobeIcon } from "@phosphor-icons/react";
+import { GithubLogoIcon, GlobeIcon, PackageIcon } from "@phosphor-icons/react";
 import { useIsFetching } from "@tanstack/react-query";
 import { Link as RouterLink, useNavigate } from "@tanstack/react-router";
 
@@ -152,8 +152,31 @@ export function Steps({ organization, organizations, repository, repositories }:
       <Flow.Node
         disabled={!repository}
         render={
-          <Button disabled={!repository} variant={repository ? "primary" : undefined}>
-            Builds
+          organization && repository ? (
+            <Button
+              onClick={() =>
+                navigate({
+                  to: "/$orgName/$repoName",
+                  params: { orgName: organization.login, repoName: repository.name },
+                })
+              }
+              variant="primary"
+            >
+              Builds
+            </Button>
+          ) : (
+            <Button disabled={!repository} variant={repository ? "primary" : undefined}>
+              Build
+            </Button>
+          )
+        }
+      />
+
+      <Flow.Node
+        disabled
+        render={
+          <Button icon={PackageIcon} disabled>
+            Version
           </Button>
         }
       />
@@ -161,17 +184,8 @@ export function Steps({ organization, organizations, repository, repositories }:
       <Flow.Node
         disabled
         render={
-          <Button disabled icon={<CpuIcon />}>
+          <Button disabled icon={<GlobeIcon />}>
             Deploy
-          </Button>
-        }
-      />
-
-      <Flow.Node
-        disabled
-        render={
-          <Button icon={<GlobeIcon />} disabled>
-            Production
           </Button>
         }
       />

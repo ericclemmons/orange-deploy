@@ -45,6 +45,11 @@ export class ProjectAgent extends Agent<Env, ProjectState> {
     return this.restartWorkflow(workflowId);
   }
 
+  @callable()
+  async getBuild(workflowId: string) {
+    return this.getWorkflow(workflowId);
+  }
+
   @callable({ description: "Get a list of workflows for the current project" })
   async listBuilds() {
     const page = this.getWorkflows({ workflowName: "BuildWorkflow" });
@@ -136,7 +141,12 @@ export class ProjectAgent extends Agent<Env, ProjectState> {
   ): Promise<void> {
     this.setState(
       produce(this.state, (draft) => {
-        draft.progress[workflowId].result = result;
+        draft.progress[workflowId] = {
+          message: "Completed",
+          percent: 100,
+          result,
+          step: "complete",
+        };
       }),
     );
 
