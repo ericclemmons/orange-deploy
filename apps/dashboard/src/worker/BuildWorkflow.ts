@@ -4,6 +4,7 @@ import {
   type AgentWorkflowStep,
   type DefaultProgress,
 } from "agents/workflows";
+import { NonRetryableError } from "cloudflare:workflows";
 
 import type { Repository } from "./AccountAgent";
 import type { githubApp } from "./githubApp";
@@ -67,7 +68,7 @@ export class BuildWorkflow extends AgentWorkflow<
     await step.sleep("1 second", "1 second");
 
     await step.do("Creating Sandbox", async () => {
-      throw new Error("Not implemented");
+      throw new NonRetryableError("Sandbox creation not implemented");
     });
 
     await this.reportProgress({
@@ -77,7 +78,7 @@ export class BuildWorkflow extends AgentWorkflow<
     });
 
     await step.do("Restoring Backup", async () => {
-      throw new Error("Not implemented");
+      throw new NonRetryableError("Backup restoration not implemented");
     });
 
     await this.reportProgress({
@@ -87,7 +88,7 @@ export class BuildWorkflow extends AgentWorkflow<
     });
 
     await step.do(`Checking out ${owner}/${repo}@${commit.sha}`, async () => {
-      throw new Error("Not implemented");
+      throw new NonRetryableError("Checking out repository not implemented");
     });
 
     await this.reportProgress({
@@ -97,7 +98,7 @@ export class BuildWorkflow extends AgentWorkflow<
     });
 
     await step.do("Installing Dependencies", async () => {
-      throw new Error("Not implemented");
+      throw new NonRetryableError("Installing dependencies not implemented");
     });
 
     await this.reportProgress({
@@ -107,7 +108,7 @@ export class BuildWorkflow extends AgentWorkflow<
     });
 
     await step.do("Linting", async () => {
-      throw new Error("Not implemented");
+      throw new NonRetryableError("Linting not implemented");
     });
 
     await this.reportProgress({
@@ -117,7 +118,7 @@ export class BuildWorkflow extends AgentWorkflow<
     });
 
     await step.do("Testing", async () => {
-      throw new Error("Not implemented");
+      throw new NonRetryableError("Testing not implemented");
     });
 
     await this.reportProgress({
@@ -127,7 +128,7 @@ export class BuildWorkflow extends AgentWorkflow<
     });
 
     await step.do("Building", async () => {
-      throw new Error("Not implemented");
+      throw new NonRetryableError("Building not implemented");
     });
 
     await this.reportProgress({
@@ -137,7 +138,7 @@ export class BuildWorkflow extends AgentWorkflow<
     });
 
     const result = await step.do("Deploying", async () => {
-      throw new Error("Not implemented");
+      throw new NonRetryableError("Deploying not implemented");
     });
 
     await step.reportComplete(result);

@@ -1,8 +1,10 @@
-import { Badge, Button, DropdownMenu, Link, Loader, Table, Text, Tooltip } from "@cloudflare/kumo";
+import { Button, DropdownMenu, Link, Table, Text } from "@cloudflare/kumo";
 import { ArrowClockwiseIcon, DotsThreeIcon, TrashIcon } from "@phosphor-icons/react";
+import { Link as RouterLink } from "@tanstack/react-router";
 
 import type { BuildWorkflowProgress } from "../../worker/BuildWorkflow";
 import type { BuildWorkflowInfo } from "../../worker/ProjectAgent";
+import { WorkflowStatusBadge } from "./WorkflowStatusBadge";
 
 export namespace BuildRow {
   export type Props = {
@@ -19,7 +21,7 @@ export function BuildRow({ onDelete, onRetry, progress, workflow }: BuildRow.Pro
       <Table.Cell>
         <Text variant="mono">
           <Link
-            href={`https://github.com/${workflow.metadata?.owner}/${workflow.metadata?.repo}/tree/${workflow.metadata?.branch}`}
+            href={`https://github.com/${workflow.metadata.owner}/${workflow.metadata.repo}/tree/${workflow.metadata.branch}`}
           >
             {workflow.metadata?.branch} <Link.ExternalIcon />
           </Link>
@@ -32,45 +34,16 @@ export function BuildRow({ onDelete, onRetry, progress, workflow }: BuildRow.Pro
       </Table.Cell>
       <Table.Cell>{new Date(workflow.createdAt).toLocaleString()}</Table.Cell>
       <Table.Cell>
-        {(() => {
-          // TODO: There should just be a Map<WorkflowStatus, String> to have a shared tooltip for `progress?.message`
-          switch (workflow.status) {
-            case "complete":
-              return <Badge variant="success">Complete</Badge>;
-            case "terminated":
-              return <Badge variant="destructive">Terminated</Badge>;
-            case "errored":
-              return (
-                <Tooltip content={workflow.error?.message} side="left">
-                  <Badge variant="destructive">Errored</Badge>
-                </Tooltip>
-              );
-            case "queued":
-              return <Badge variant="beta">Queued</Badge>;
-            case "unknown":
-              return <Badge variant="beta">Unknown</Badge>;
-            case "running":
-              return (
-                <>
-                  <Tooltip content={progress?.message} side="top">
-                    <Badge className=" flex items-center gap-2" variant="primary">
-                      <Loader size={12} />
-                      Running
-                    </Badge>
-                  </Tooltip>
-                </>
-              );
-            case "waiting":
-              return <Badge variant="outline">Waiting</Badge>;
-            case "waitingForPause":
-            case "paused":
-              return <Badge variant="outline">Paused</Badge>;
-
-            default:
-              workflow.status satisfies never;
-              return null;
-          }
-        })()}
+        <RouterLink
+          to="/$orgName/$repoName/builds/$buildId"
+          params={{
+            orgName: workflow.metadata.owner,
+            repoName: workflow.metadata.repo,
+            buildId: workflow.workflowId,
+          }}
+        >
+          <WorkflowStatusBadge progress={progress} workflow={workflow} />
+        </RouterLink>
       </Table.Cell>
       <Table.Cell>
         <DropdownMenu>
