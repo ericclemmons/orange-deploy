@@ -2,12 +2,12 @@ import { Loader } from "@cloudflare/kumo";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createFileRoute, Outlet } from "@tanstack/react-router";
 
-import type { AccountState } from "../../worker/AccountAgent";
+import type { AccountAgent, AccountState } from "../../worker/AccountAgent";
 import { loadAgent } from "../utils/loadAgent";
 
 export const Route = createFileRoute("/_account")({
   beforeLoad: async () => {
-    using agent = await loadAgent<AccountState>(
+    using agent = await loadAgent<AccountAgent, AccountState>(
       "account-agent",
       import.meta.env.VITE_CLOUDFLARE_ACCOUNT_ID,
     );

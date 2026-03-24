@@ -10,8 +10,12 @@ import { loadAgent } from "../utils/loadAgent";
 export const Route = createFileRoute("/_account/$orgName/$repoName/builds/$buildId")({
   beforeLoad: async ({ params }) => {
     const { orgName, repoName, buildId } = params;
-    using agent = await loadAgent<ProjectState>("project-agent", `${orgName}.${repoName}`);
-    const build = await agent.client.call<BuildWorkflowInfo | undefined>("getBuild", [buildId]);
+    using agent = await loadAgent<ProjectAgent, ProjectState>(
+      "project-agent",
+      `${orgName}.${repoName}`,
+    );
+    // @ts-expect-error `getBuild` isn't Serializable due to `WorkflowInfo`
+    const build = (await agent.client.call("getBuild", [buildId])) as BuildWorkflowInfo;
 
     if (!build) {
       throw redirect({ to: "/$orgName/$repoName", params: { orgName, repoName } });
