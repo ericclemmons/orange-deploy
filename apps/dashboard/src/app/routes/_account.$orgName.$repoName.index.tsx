@@ -11,7 +11,7 @@ import { PackageIcon, PlayIcon, TrashIcon } from "@phosphor-icons/react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useAgent } from "agents/react";
-import { Activity, useState } from "react";
+import { Activity } from "react";
 
 import type { BuildWorkflowInfo, ProjectAgent, ProjectState } from "../../worker/ProjectAgent";
 import { BuildRow } from "../components/BuildRow";
@@ -22,7 +22,6 @@ export const Route = createFileRoute("/_account/$orgName/$repoName/")({
 });
 
 function BuildsRoute() {
-  const [state, setState] = useState<ProjectState>({ progress: {} });
   const toast = useKumoToastManager();
   const { organization, organizations, repository } = Route.useRouteContext();
   const project = useAgent<ProjectAgent, ProjectState>({
@@ -33,12 +32,8 @@ function BuildsRoute() {
       console.debug("onMessage", message);
       return listBuilds.refetch();
     },
-    onStateUpdate: (state, source) => {
-      setState(state);
-      console.debug("onStateUpdate", state, source);
-      // TODO: Use a collection to optimistically update the build list
-      return listBuilds.refetch();
-    },
+    // TODO: Use a collection to optimistically update the build list
+    onStateUpdate: () => listBuilds.refetch(),
   });
 
   // @ts-ignore Errors with `vp check --fx`, but not Cursor 🤔
@@ -161,7 +156,7 @@ function BuildsRoute() {
                   onDelete={deleteBuild.mutate}
                   onRetry={project.stub.retryBuild}
                   // @ts-ignore Errors with `vp check --fx`, but not Cursor 🤔
-                  progress={state.progress[workflow.workflowId]}
+                  progress={project.state?.progress[workflow.workflowId]}
                   workflow={workflow}
                 />
               ))}

@@ -1,7 +1,6 @@
 import { Button, LayerCard, Text, useKumoToastManager } from "@cloudflare/kumo";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useAgent } from "agents/react";
-import { useState } from "react";
 
 import type { BuildWorkflowInfo, ProjectAgent, ProjectState } from "../../worker/ProjectAgent";
 import { Steps } from "../components/Steps";
@@ -26,19 +25,17 @@ export const Route = createFileRoute("/_account/$orgName/$repoName/builds/$build
 function BuildDetailsRoute() {
   const { organization, organizations, repository, build } = Route.useRouteContext();
   const toast = useKumoToastManager();
-  const [state, setState] = useState<ProjectState>({ progress: {} });
 
-  useAgent<ProjectAgent, ProjectState>({
+  const project = useAgent<ProjectAgent, ProjectState>({
     agent: "project-agent",
     name: `${organization.login}.${repository.name}`,
     onError: (error) => toast.add({ description: error.type, variant: "error" }),
     onMessage: (message) => {
       console.debug("onMessage", message);
     },
-    onStateUpdate: (state) => setState(state),
   });
 
-  const progress = state.progress[build.workflowId];
+  const progress = project.state?.progress[build.workflowId];
 
   return (
     <>
