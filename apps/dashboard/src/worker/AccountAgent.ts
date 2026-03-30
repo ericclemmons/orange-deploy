@@ -72,7 +72,9 @@ export class AccountAgent extends Agent<Env, AccountState> {
 
   @callable({ description: "Get a list of orgs on this account" })
   async getOrganizations() {
-    return Object.values(this.state.installations).map(({ account }) => account);
+    return Object.values(this.state.installations)
+      .map(({ account }) => account)
+      .toSorted((a, b) => a.login.localeCompare(b.login));
   }
 
   @callable({ description: "Get a single repository from GitHub" })
