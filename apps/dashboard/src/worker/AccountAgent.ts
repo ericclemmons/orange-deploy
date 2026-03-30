@@ -1,5 +1,8 @@
-import { Agent, callable } from "agents";
+import { Agent, callable, getCurrentAgent, type Connection, type ConnectionContext } from "agents";
+import { HTTPException } from "hono/http-exception";
+import { parse } from "hono/utils/cookie";
 import { produce } from "immer";
+import { Octokit } from "octokit";
 
 import { githubApp } from "./githubApp";
 
@@ -25,10 +28,21 @@ export type GetRepositoryResponse = Awaited<
 
 export type Repository = SearchRepositoriesResponse["items"][number];
 
+export type AccountConnectionState = {
+  gh_token?: string;
+};
+
 export class AccountAgent extends Agent<Env, AccountState> {
   initialState: AccountState = {
     installations: {},
   };
+
+  async onConnect(connection: Connection, ctx: ConnectionContext) {
+    console.info(ctx.request.headers.get("cookie"));
+    const { gh_token } = parse(ctx.request.headers.get("cookie") ?? "", "gh_token");
+    console.info({ gh_token });
+    connection.setState({ gh_token });
+  }
 
   async getInstallation(installation_id: number) {
     const { data } = await githubApp.octokit.rest.apps.getInstallation({
@@ -56,6 +70,13 @@ export class AccountAgent extends Agent<Env, AccountState> {
     return githubApp.getInstallationOctokit(installation.id);
   }
 
+  @callable({ description: "Get a list of orgs on this account" })
+  async getOrganizations() {
+    return Object.values(this.state.installations)
+      .map(({ account }) => account)
+      .toSorted((a, b) => a.login.localeCompare(b.login));
+  }
+
   @callable({ description: "Get a single repository from GitHub" })
   async getRepository(owner: Installation["account"]["login"], repo: string) {
     const octokit = await this.getOctokitByOwner(owner);
@@ -69,11 +90,13 @@ export class AccountAgent extends Agent<Env, AccountState> {
     owner: Installation["account"]["login"],
     repo?: string,
   ): Promise<SearchRepositoriesResponse> {
-    const octokit = await this.getOctokitByOwner(owner);
-
+    const auth = await this.verifyGitHubToken();
+    const octokit = new Octokit({ auth });
     const { data } = await octokit.rest.search.repos({
       per_page: 10,
-      q: [`user:${owner}`, repo ? `${repo} in:name` : null].filter(Boolean).join(" "),
+      q: [`archived:false`, `user:${owner}`, repo ? `${repo} in:name` : null]
+        .filter(Boolean)
+        .join(" "),
       sort: "updated",
     });
 
@@ -91,5 +114,16 @@ export class AccountAgent extends Agent<Env, AccountState> {
     );
 
     return installation;
+  }
+
+  private async verifyGitHubToken() {
+    const { connection } = getCurrentAgent() as { connection?: Connection<AccountConnectionState> };
+    const gh_token = connection?.state?.gh_token;
+
+    if (!gh_token) {
+      throw new HTTPException(401, { message: "GitHub token cookie is required" });
+    }
+
+    return gh_token;
   }
 }

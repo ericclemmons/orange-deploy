@@ -12,23 +12,40 @@ import { sign, verify } from "hono/jwt";
 import type { AccountAgent } from "./AccountAgent";
 
 export { AccountAgent } from "./AccountAgent";
-export { ProjectAgent } from "./ProjectAgent";
 export { BuildWorkflow } from "./BuildWorkflow";
+export { ProjectAgent } from "./ProjectAgent";
 
-const GitHubCallback = type({
-  code: "string",
-  installation_id: "string.numeric.parse",
-  setup_action: "'install' | 'update'",
-});
+const GitHubCallback = type({ code: "string", "installation_id?": "string.numeric.parse" });
 
 const app = new Hono();
 
 app.use("/api/*", csrf());
 
-app.get("/api/auth/github", (c) =>
-  c.redirect(`https://github.com/apps/orange-cloud-deploy/installations/new`),
-);
+app.get("/api/github/install", sValidator("query", type({ "org?": "string" })), async (c) => {
+  const { org } = c.req.valid("query");
 
+  if (!org) {
+    return c.redirect(`https://github.com/apps/orange-cloud-deploy/installations/new`);
+  }
+
+  const account = await getAgentByName<Env, AccountAgent>(
+    env.AccountAgent,
+    env.VITE_CLOUDFLARE_ACCOUNT_ID,
+  );
+
+  try {
+    const installation = await account.getInstallationByOwner(org);
+    return c.redirect(
+      `https://github.com/apps/orange-cloud-deploy/installations/new/permissions?target_id=${installation.account.id}`,
+    );
+  } catch {
+    return c.redirect(`https://github.com/apps/orange-cloud-deploy/installations/new`);
+  }
+});
+
+app.get("/api/auth/github", async (c) => {
+  return c.redirect(`https://github.com/login/oauth/authorize?client_id=${env.GITHUB_CLIENT_ID}`);
+});
 app.get(
   "/api/auth/github/callback",
   githubAuth({
@@ -37,21 +54,33 @@ app.get(
   }),
   sValidator("query", GitHubCallback),
   async (c) => {
-    const { installation_id } = c.req.valid("query");
+    const query = c.req.valid("query");
 
-    const account = await getAgentByName<Env, AccountAgent>(
-      env.AccountAgent,
-      env.VITE_CLOUDFLARE_ACCOUNT_ID,
-    );
+    if (query.installation_id) {
+      const account = await getAgentByName<Env, AccountAgent>(
+        env.AccountAgent,
+        env.VITE_CLOUDFLARE_ACCOUNT_ID,
+      );
 
-    await account.saveInstallation(installation_id);
+      await account.saveInstallation(query.installation_id);
+    }
+
+    const ghToken = c.get("token");
+
+    if (ghToken) {
+      setCookie(c, "gh_token", ghToken.token, {
+        httpOnly: true,
+        maxAge: ghToken.expires_in,
+        secure: true,
+      });
+    }
 
     const user = c.get("user-github")!;
-    const jwt = await sign({ installation_id, sub: user.id, login: user.login }, env.JWT_SECRET);
+    const jwt = await sign({ sub: user.id, login: user.login }, env.JWT_SECRET);
 
     setCookie(c, "session", jwt, {
-      maxAge: 2592000,
       httpOnly: true,
+      maxAge: 2592000,
       secure: true,
     });
 

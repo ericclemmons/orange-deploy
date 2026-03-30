@@ -27,9 +27,8 @@ function SelectRepositoryRoute() {
   const search = Route.useSearch();
   const queryClient = useQueryClient();
   const queryKey = ["repositories", { organization: organization.login }];
-
   const accountAgent = useAgent<AccountAgent, AccountState>({
-    agent: "account-agent",
+    agent: "AccountAgent",
     name: import.meta.env.VITE_CLOUDFLARE_ACCOUNT_ID,
   });
 

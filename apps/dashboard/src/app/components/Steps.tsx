@@ -75,7 +75,7 @@ export function Steps({ organization, organizations, repository, repositories }:
 
                   <Link
                     className="group mx-1.5 grid cursor-pointer grid-cols-[1fr_16px] gap-2 rounded px-2 py-1.5 text-base data-highlighted:bg-kumo-tint"
-                    href="/api/auth/github"
+                    href="/api/github/install"
                     variant="plain"
                   >
                     <div className="flex items-center gap-2!">
