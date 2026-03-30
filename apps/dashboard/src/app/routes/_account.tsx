@@ -1,4 +1,4 @@
-import { Loader } from "@cloudflare/kumo";
+import { Empty, Link, Loader } from "@cloudflare/kumo";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createFileRoute, Outlet } from "@tanstack/react-router";
 
@@ -21,6 +21,18 @@ export const Route = createFileRoute("/_account")({
     return { account: agent.state, organizations };
   },
   component: AccountLayout,
+  errorComponent: ({ error }) => {
+    if (error.cause instanceof Response && error.cause.status === 401) {
+      return (
+        <Empty
+          title={error.cause.statusText}
+          contents={<Link href="/api/auth/github">Connect to GitHub</Link>}
+        />
+      );
+    }
+
+    return <Empty title={error.name} description={error.message} />;
+  },
   pendingComponent: Loader,
 });
 
