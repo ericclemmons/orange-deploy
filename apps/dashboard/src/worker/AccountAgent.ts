@@ -38,9 +38,7 @@ export class AccountAgent extends Agent<Env, AccountState> {
   };
 
   async onConnect(connection: Connection, ctx: ConnectionContext) {
-    console.info(ctx.request.headers.get("cookie"));
     const { gh_token } = parse(ctx.request.headers.get("cookie") ?? "", "gh_token");
-    console.info({ gh_token });
     connection.setState({ gh_token });
   }
 
